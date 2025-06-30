@@ -7,7 +7,7 @@
 import os
 import json
 from pathlib import Path
-from typing import Optional, Dict, Any
+from typing import Optional, Dict, Any, Literal
 
 from synthetic_data_kit.models.llm_client import LLMClient
 from synthetic_data_kit.generators.qa_generator import QAGenerator
@@ -24,6 +24,7 @@ def read_json(file_path):
 def process_file(
     file_path: str,
     output_dir: str,
+    doc_type: Literal['text', 'code'] = 'text',
     config_path: Optional[Path] = None,
     api_base: Optional[str] = None,
     model: Optional[str] = None,
@@ -81,6 +82,7 @@ def process_file(
         result = generator.process_document(
             document_text,
             num_pairs=num_pairs,
+            doc_type=doc_type,  # Use the specified doc_type
             verbose=verbose
         )
         

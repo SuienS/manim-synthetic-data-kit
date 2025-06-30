@@ -5,7 +5,7 @@
 # the root directory of this source tree.
 # Create QA Pairs
 
-from typing import Dict, List, Any, Optional, Tuple
+from typing import Dict, List, Any, Optional, Tuple, Literal
 import json
 import time
 import os
@@ -57,6 +57,7 @@ class QAGenerator:
     def generate_qa_pairs(self, 
                         document_text: str, 
                         summary: str, 
+                        doc_type: str = 'text',
                         num_pairs: int = 25) -> List[Dict[str, str]]:
         """Generate QA pairs from the document using batched processing"""
         verbose = os.environ.get('SDK_VERBOSE', 'false').lower() == 'true'
@@ -71,6 +72,7 @@ class QAGenerator:
         chunks = split_into_chunks(
             document_text, 
             chunk_size=chunk_size, 
+            doc_type=doc_type,
             overlap=overlap
         )
         
@@ -269,6 +271,7 @@ class QAGenerator:
     def process_document(self, 
                        document_text: str, 
                        num_pairs: int = 25, 
+                       doc_type: Literal['text', 'code'] = 'text',
                        verbose: bool = False) -> Dict[str, Any]:
         """Process a document to generate QA pairs without rating"""
         # Set the verbose environment variable
@@ -281,7 +284,7 @@ class QAGenerator:
         summary = self.generate_summary(document_text)
         
         # Generate QA pairs
-        qa_pairs = self.generate_qa_pairs(document_text, summary, num_pairs=num_pairs)
+        qa_pairs = self.generate_qa_pairs(document_text, summary, doc_type=doc_type, num_pairs=num_pairs)
         
         # Prepare result - no rating at this stage
         result = {

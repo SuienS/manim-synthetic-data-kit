@@ -5,7 +5,7 @@ build-backend = "hatchling.build"
 [project]
 name = "manim-synthetic-data-kit"
 version = "0.0.4b2"
-description = "Tool for generating high quality Synthetic datasets"
+description = "Tool for generating high quality Synthetic datasets (UPDATED FOR: ManimCE code generation)"
 readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "MIT"}
@@ -27,14 +27,16 @@ dependencies = [
 ]
 
 # These fields appear in pip show
-summary = "Create and curate synthetic datasets for fine-tuning LLMs"
+summary = "Create and curate synthetic datasets for fine-tuning LLMs (UPDATED FOR: ManimCE code generation)"
 authors = [
     {name = "Sanyam Bhutani", email = "sanyambhutani@meta.com"},
     {name = "Hamid Shojanazeri", email = "hamidnazeri@meta.com"},
+    {name = "Ravidu Silva", email = "ravidus.ac@gmail.com"},
 ]
 maintainers = [
     {name = "Sanyam Bhutani", email = "sanyambhutani@meta.com"},
     {name = "Hamid Shojanazeri", email = "hamidnazeri@meta.com"},
+    {name = "Ravidu Silva", email = "ravidus.ac@gmail.com"},
 ]
 keywords = ["llm", "synthetic-data", "fine-tuning", "llama", "ai", "machine-learning", "nlp", "dataset-generation", "chain-of-thought", "tool-use", "reasoning"]
 classifiers = [

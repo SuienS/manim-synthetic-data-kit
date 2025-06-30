@@ -6,31 +6,58 @@
 # Text processing utilities
 import re
 import json
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Literal
 
-def split_into_chunks(text: str, chunk_size: int = 4000, overlap: int = 200) -> List[str]:
+def split_into_chunks(text: str, doc_type: Literal['text', 'code'] = 'text', chunk_size: int = 4000, overlap: int = 200) -> List[str]:
     """Split text into chunks with optional overlap"""
-    paragraphs = text.split("\n\n")
     chunks = []
-    current_chunk = ""
-    
-    for para in paragraphs:
-        if len(current_chunk) + len(para) > chunk_size and current_chunk:
+
+    if doc_type == 'code':
+        # For code, we split by classes
+        code_blocks = re.split(r'\n(?=class |def |@)', text)
+        current_chunk = ""
+        for block in code_blocks:
+            block = block.strip()
+            if len(current_chunk) + len(block) > chunk_size and current_chunk:
+                chunks.append(current_chunk)
+                # Keep some overlap for context
+                if len(current_chunk) > overlap:
+                    current_chunk = current_chunk[-overlap:] + "\n\n" + block
+                else:
+                    current_chunk = block
+            else:
+                if current_chunk:
+                    current_chunk += "\n\n" + block
+                else:
+                    current_chunk = block
+        
+        if current_chunk:
             chunks.append(current_chunk)
-            # Keep some overlap for context
-            sentences = current_chunk.split('. ')
-            if len(sentences) > 3:
-                current_chunk = '. '.join(sentences[-3:]) + "\n\n" + para
-            else:
-                current_chunk = para
-        else:
-            if current_chunk:
-                current_chunk += "\n\n" + para
-            else:
-                current_chunk = para
     
-    if current_chunk:
-        chunks.append(current_chunk)
+    elif doc_type == 'text':
+        # For text, we split by paragraphs to maintain readability
+        paragraphs = text.split("\n\n")
+        current_chunk = ""
+        
+        for para in paragraphs:
+            if len(current_chunk) + len(para) > chunk_size and current_chunk:
+                chunks.append(current_chunk)
+                # Keep some overlap for context
+                sentences = current_chunk.split('. ')
+                if len(sentences) > 3:
+                    current_chunk = '. '.join(sentences[-3:]) + "\n\n" + para
+                else:
+                    current_chunk = para
+            else:
+                if current_chunk:
+                    current_chunk += "\n\n" + para
+                else:
+                    current_chunk = para
+        
+        if current_chunk:
+            chunks.append(current_chunk)
+    else:
+        raise ValueError("Invalid type specified. Use 'text' or 'code'.")
     
     return chunks
 

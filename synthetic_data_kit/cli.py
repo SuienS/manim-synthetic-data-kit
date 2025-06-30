@@ -189,6 +189,9 @@ def create(
     content_type: str = typer.Option(
         "qa", "--type", help="Type of content to generate [qa|summary|cot|cot-enhance]"
     ),
+    doc_type: str = typer.Option(
+        "text", "--doc-type", help="Document type [text|code]"
+    ),
     output_dir: Optional[Path] = typer.Option(
         None, "--output-dir", "-o", help="Where to save the output"
     ),
@@ -255,16 +258,17 @@ def create(
         output_dir = get_path_config(ctx.config, "output", "generated")
     
     try:
-        with console.status(f"Generating {content_type} content from {input}..."):
+        with console.status(f"Generating {content_type} (doc type: {doc_type}) content from {input}..."):
             output_path = process_file(
-                input,
-                output_dir,
-                ctx.config_path,
-                api_base,
-                model,
-                content_type,
-                num_pairs,
-                verbose,
+                file_path=input,
+                output_dir=output_dir,
+                doc_type=doc_type,  # Use the specified doc_type
+                config_path=ctx.config_path,
+                api_base=api_base,
+                model=model,
+                content_type=content_type,
+                num_pairs=num_pairs,
+                verbose=verbose,
                 provider=provider  # Pass the provider parameter
             )
         if output_path:
