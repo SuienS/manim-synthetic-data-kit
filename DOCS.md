@@ -78,7 +78,7 @@ graph TD
 ### Directory Structure
 
 ```
-synthetic-data-kit/
+manim-synthetic-data-kit/
 ├── synthetic_data_kit/        # Package source code
 │   ├── __init__.py           # Package initialization
 │   ├── cli.py                # CLI entry point using Typer
@@ -213,14 +213,14 @@ sequenceDiagram
     participant QAGenerator
     participant FormatConverter
     
-    User->>CLI: synthetic-data-kit ingest file.pdf
+    User->>CLI: manim-synthetic-data-kit ingest file.pdf
     CLI->>Parsers: determine_parser(file.pdf)
     Parsers-->>CLI: PDFParser
     CLI->>Parsers: parse(file.pdf)
     Parsers-->>CLI: Extracted text
     CLI-->>User: Text saved to data/output/file.txt
     
-    User->>CLI: synthetic-data-kit create file.txt
+    User->>CLI: manim-synthetic-data-kit create file.txt
     CLI->>LLMClient: Initialize with config
     CLI->>QAGenerator: process_document(text)
     QAGenerator->>LLMClient: generate_summary()
@@ -232,7 +232,7 @@ sequenceDiagram
     QAGenerator-->>CLI: Results
     CLI-->>User: QA pairs saved to data/generated/file_qa_pairs.json
     
-    User->>CLI: synthetic-data-kit curate file_qa_pairs.json -v
+    User->>CLI: manim-synthetic-data-kit curate file_qa_pairs.json -v
     CLI->>LLMClient: Initialize with config
     CLI->>QAGenerator: rate_qa_pairs()
     
@@ -256,7 +256,7 @@ sequenceDiagram
     QAGenerator-->>CLI: Filtered pairs with stats
     CLI-->>User: Cleaned data saved to data/cleaned/file_cleaned.json
     
-    User->>CLI: synthetic-data-kit save-as file_cleaned.json -f ft
+    User->>CLI: manim-synthetic-data-kit save-as file_cleaned.json -f ft
     CLI->>FormatConverter: convert_format(input, output, format)
     FormatConverter-->>CLI: Converted data
     CLI-->>User: Data saved to data/final/file_ft.json
@@ -274,14 +274,14 @@ sequenceDiagram
 #### From PyPI
 
 ```bash
-pip install synthetic-data-kit
+pip install manim-synthetic-data-kit
 ```
 
 #### From Source
 
 ```bash
-git clone https://github.com/meta-llama/synthetic-data-kit.git
-cd synthetic-data-kit
+git clone https://github.com/meta-llama/manim-synthetic-data-kit.git
+cd manim-synthetic-data-kit
 pip install -e .
 ```
 
@@ -303,7 +303,7 @@ Synthetic Data Kit provides a Typer-based CLI interface with subcommands for eac
 ### Command Structure
 
 ```
-synthetic-data-kit [OPTIONS] COMMAND [ARGS]...
+manim-synthetic-data-kit [OPTIONS] COMMAND [ARGS]...
 ```
 
 ### Global Options
@@ -317,7 +317,7 @@ synthetic-data-kit [OPTIONS] COMMAND [ARGS]...
 
 ```mermaid
 graph LR
-    SDK[synthetic-data-kit] --> Ingest[ingest]
+    SDK[manim-synthetic-data-kit] --> Ingest[ingest]
     SDK --> Create[create]
     SDK --> Curate[curate]
     SDK --> SaveAs[save-as]
@@ -343,7 +343,7 @@ graph LR
 Verifies if the VLLM server is running.
 
 ```bash
-synthetic-data-kit system-check [OPTIONS]
+manim-synthetic-data-kit system-check [OPTIONS]
 ```
 
 #### Options:
@@ -356,10 +356,10 @@ synthetic-data-kit system-check [OPTIONS]
 
 ```bash
 # Check default server
-synthetic-data-kit system-check
+manim-synthetic-data-kit system-check
 
 # Check specific server
-synthetic-data-kit system-check --api-base="http://localhost:8000/v1"
+manim-synthetic-data-kit system-check --api-base="http://localhost:8000/v1"
 ```
 
 ### `ingest` Command
@@ -367,7 +367,7 @@ synthetic-data-kit system-check --api-base="http://localhost:8000/v1"
 Parses documents into clean text.
 
 ```bash
-synthetic-data-kit ingest [OPTIONS] INPUT
+manim-synthetic-data-kit ingest [OPTIONS] INPUT
 ```
 
 #### Arguments:
@@ -387,16 +387,16 @@ synthetic-data-kit ingest [OPTIONS] INPUT
 
 ```bash
 # Parse a PDF file
-synthetic-data-kit ingest documents/paper.pdf
+manim-synthetic-data-kit ingest documents/paper.pdf
 
 # Parse with custom output directory
-synthetic-data-kit ingest documents/paper.pdf -o custom_dir/
+manim-synthetic-data-kit ingest documents/paper.pdf -o custom_dir/
 
 # Parse a web page
-synthetic-data-kit ingest "https://example.com/article"
+manim-synthetic-data-kit ingest "https://example.com/article"
 
 # Parse a YouTube video
-synthetic-data-kit ingest "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+manim-synthetic-data-kit ingest "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 ```
 
 ### `create` Command
@@ -404,7 +404,7 @@ synthetic-data-kit ingest "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 Generates content from text files.
 
 ```bash
-synthetic-data-kit create [OPTIONS] INPUT
+manim-synthetic-data-kit create [OPTIONS] INPUT
 ```
 
 #### Arguments:
@@ -428,19 +428,19 @@ synthetic-data-kit create [OPTIONS] INPUT
 
 ```bash
 # Generate QA pairs
-synthetic-data-kit create data/output/document.txt
+manim-synthetic-data-kit create data/output/document.txt
 
 # Specify number of pairs
-synthetic-data-kit create data/output/document.txt -n 30
+manim-synthetic-data-kit create data/output/document.txt -n 30
 
 # Generate summary only
-synthetic-data-kit create data/output/document.txt --type summary
+manim-synthetic-data-kit create data/output/document.txt --type summary
 
 # Generate Chain of Thought (CoT) reasoning examples
-synthetic-data-kit create data/output/document.txt --type cot
+manim-synthetic-data-kit create data/output/document.txt --type cot
 
 # Use custom model
-synthetic-data-kit create data/output/document.txt -m "meta-llama/Llama-3.3-8B-Instruct"
+manim-synthetic-data-kit create data/output/document.txt -m "meta-llama/Llama-3.3-8B-Instruct"
 ```
 
 ### `curate` Command
@@ -448,7 +448,7 @@ synthetic-data-kit create data/output/document.txt -m "meta-llama/Llama-3.3-8B-I
 Filters content based on quality.
 
 ```bash
-synthetic-data-kit curate [OPTIONS] INPUT
+manim-synthetic-data-kit curate [OPTIONS] INPUT
 ```
 
 #### Arguments:
@@ -470,13 +470,13 @@ synthetic-data-kit curate [OPTIONS] INPUT
 
 ```bash
 # Clean with default settings
-synthetic-data-kit curate data/generated/document_qa_pairs.json
+manim-synthetic-data-kit curate data/generated/document_qa_pairs.json
 
 # Set higher quality threshold
-synthetic-data-kit curate data/generated/document_qa_pairs.json -t 8.5
+manim-synthetic-data-kit curate data/generated/document_qa_pairs.json -t 8.5
 
 # Specify output location
-synthetic-data-kit curate data/generated/document_qa_pairs.json -o custom_path.json
+manim-synthetic-data-kit curate data/generated/document_qa_pairs.json -o custom_path.json
 ```
 
 ### `save-as` Command
@@ -484,7 +484,7 @@ synthetic-data-kit curate data/generated/document_qa_pairs.json -o custom_path.j
 Converts content to different formats.
 
 ```bash
-synthetic-data-kit save-as [OPTIONS] INPUT
+manim-synthetic-data-kit save-as [OPTIONS] INPUT
 ```
 
 #### Arguments:
@@ -505,16 +505,16 @@ synthetic-data-kit save-as [OPTIONS] INPUT
 
 ```bash
 # Convert to JSONL format
-synthetic-data-kit save-as data/cleaned/document_cleaned.json -f jsonl
+manim-synthetic-data-kit save-as data/cleaned/document_cleaned.json -f jsonl
 
 # Convert to fine-tuning format (JSON file)
-synthetic-data-kit save-as data/cleaned/document_cleaned.json -f ft
+manim-synthetic-data-kit save-as data/cleaned/document_cleaned.json -f ft
 
 # Convert to fine-tuning format (HF dataset)
-synthetic-data-kit save-as data/cleaned/document_cleaned.json -f ft --storage hf
+manim-synthetic-data-kit save-as data/cleaned/document_cleaned.json -f ft --storage hf
 
 # Convert to ChatML format (HF dataset) with specific output location 
-synthetic-data-kit save-as data/cleaned/document_cleaned.json -f chatml --storage hf -o data/final/custom_name
+manim-synthetic-data-kit save-as data/cleaned/document_cleaned.json -f chatml --storage hf -o data/final/custom_name
 ```
 
 ## 5. Configuration System
@@ -613,7 +613,7 @@ prompts:
 You can specify a custom configuration file using the `-c` option:
 
 ```bash
-synthetic-data-kit -c custom_config.yaml ingest documents/paper.pdf
+manim-synthetic-data-kit -c custom_config.yaml ingest documents/paper.pdf
 ```
 
 ### Configuration Priorities
@@ -1191,7 +1191,7 @@ Setting these variables can help with debugging and performance tuning:
 # Process one QA pair at a time with detailed output
 export SDK_VERBOSE=true
 export SDK_BATCH_SIZE=1
-synthetic-data-kit curate data/generated/results.json
+manim-synthetic-data-kit curate data/generated/results.json
 ```
 
 ## 10. Workflow Examples
@@ -1203,19 +1203,19 @@ synthetic-data-kit curate data/generated/results.json
 vllm serve meta-llama/Llama-3.3-70B-Instruct --port 8000
 
 # Check if server is running
-synthetic-data-kit system-check
+manim-synthetic-data-kit system-check
 
 # 1. Parse a PDF document
-synthetic-data-kit ingest documents/paper.pdf
+manim-synthetic-data-kit ingest documents/paper.pdf
 
 # 2. Generate QA pairs from the parsed text
-synthetic-data-kit create data/output/paper.txt
+manim-synthetic-data-kit create data/output/paper.txt
 
 # 3. Clean and filter the generated content
-synthetic-data-kit curate data/generated/paper_qa_pairs.json
+manim-synthetic-data-kit curate data/generated/paper_qa_pairs.json
 
 # 4. Convert to fine-tuning format
-synthetic-data-kit save-as data/cleaned/paper_cleaned.json -f ft
+manim-synthetic-data-kit save-as data/cleaned/paper_cleaned.json -f ft
 ```
 
 ### Advanced Configuration Example
@@ -1261,10 +1261,10 @@ Use the custom configuration:
 
 ```bash
 # Process technical documentation with custom config
-synthetic-data-kit -c technical_docs.yaml ingest documentation/api_docs.pdf
-synthetic-data-kit -c technical_docs.yaml create data/output/api_docs.txt
-synthetic-data-kit -c technical_docs.yaml curate data/generated/api_docs_qa_pairs.json
-synthetic-data-kit -c technical_docs.yaml save-as data/cleaned/api_docs_cleaned.json -f ft
+manim-synthetic-data-kit -c technical_docs.yaml ingest documentation/api_docs.pdf
+manim-synthetic-data-kit -c technical_docs.yaml create data/output/api_docs.txt
+manim-synthetic-data-kit -c technical_docs.yaml curate data/generated/api_docs_qa_pairs.json
+manim-synthetic-data-kit -c technical_docs.yaml save-as data/cleaned/api_docs_cleaned.json -f ft
 ```
 
 ### Processing Multiple Files
@@ -1275,16 +1275,16 @@ for file in documents/*.pdf; do
   filename=$(basename "$file" .pdf)
   
   # Ingest
-  synthetic-data-kit ingest "$file"
+  manim-synthetic-data-kit ingest "$file"
   
   # Create QA pairs
-  synthetic-data-kit create "data/output/${filename}.txt" -n 20
+  manim-synthetic-data-kit create "data/output/${filename}.txt" -n 20
   
   # Curate
-  synthetic-data-kit curate "data/generated/${filename}_qa_pairs.json" -t 7.5
+  manim-synthetic-data-kit curate "data/generated/${filename}_qa_pairs.json" -t 7.5
   
   # Save as fine-tuning format
-  synthetic-data-kit save-as "data/cleaned/${filename}_cleaned.json" -f ft
+  manim-synthetic-data-kit save-as "data/cleaned/${filename}_cleaned.json" -f ft
 done
 ```
 
@@ -1444,7 +1444,7 @@ def to_custom_format(qa_pairs: List[Dict[str, str]], output_path: str) -> str:
                 "text": pair["answer"]
             },
             "metadata": {
-                "source": "synthetic-data-kit"
+                "source": "manim-synthetic-data-kit"
             }
         })
     
@@ -1661,7 +1661,7 @@ File not found: documents/paper.pdf
 
 ```bash
 # Using the built-in system-check command
-synthetic-data-kit system-check --api-base="http://localhost:8000/v1"
+manim-synthetic-data-kit system-check --api-base="http://localhost:8000/v1"
 
 # Direct API check
 curl -X GET http://localhost:8000/v1/models
@@ -1687,14 +1687,14 @@ jq '.metrics' data/cleaned/document_cleaned.json
 
 ```bash
 # Test just the parser
-synthetic-data-kit ingest documents/paper.pdf -o test_output/
+manim-synthetic-data-kit ingest documents/paper.pdf -o test_output/
 
 # Test just content creation with a small text file
 echo "This is a test document." > test.txt
-synthetic-data-kit create test.txt -n 2
+manim-synthetic-data-kit create test.txt -n 2
 
 # Test just format conversion with a known good file
-synthetic-data-kit save-as known_good_data.json -f jsonl
+manim-synthetic-data-kit save-as known_good_data.json -f jsonl
 ```
 
 ## 14. Best Practices

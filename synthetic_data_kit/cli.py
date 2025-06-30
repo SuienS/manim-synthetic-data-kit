@@ -3,7 +3,7 @@
 #
 # This source code is licensed under the terms described in the LICENSE file in
 # the root directory of this source tree.
-# CLI Logic for synthetic-data-kit
+# CLI Logic for manim-synthetic-data-kit
 
 import os
 import typer
@@ -19,7 +19,7 @@ from synthetic_data_kit.server.app import run_server
 
 # Initialize Typer app
 app = typer.Typer(
-    name="synthetic-data-kit",
+    name="manim-synthetic-data-kit",
     help="A toolkit for preparing synthetic datasets for fine-tuning LLMs",
     add_completion=True,
 )

@@ -45,20 +45,20 @@ conda create -n synthetic-data python=3.10
 
 conda activate synthetic-data
 
-pip install synthetic-data-kit
+pip install manim-synthetic-data-kit
 ```
 
 #### (Alternatively) From Source
 
 ```bash
 git clone https://github.com/meta-llama/synthetic-data-kit.git
-cd synthetic-data-kit
+cd manim-synthetic-data-kit
 pip install -e .
 ```
 
 To get an overview of commands type: 
 
-`synthetic-data-kit --help`
+`manim-synthetic-data-kit --help`
 
 ### 1. Tool Setup
 
@@ -83,27 +83,27 @@ The flow follows 4 simple steps: `ingest`, `create`, `curate`, `save-as`, please
 
 ```bash
 # Check if your backend is running
-synthetic-data-kit system-check
+manim-synthetic-data-kit system-check
 
 # Parse a document to text
-synthetic-data-kit ingest docs/report.pdf
+manim-synthetic-data-kit ingest docs/report.pdf
 # This will save file to data/output/report.txt
 
 # Generate QA pairs (default)
-synthetic-data-kit create data/output/report.txt --type qa
+manim-synthetic-data-kit create data/output/report.txt --type qa
 
 OR 
 
 # Generate Chain of Thought (CoT) reasoning examples
-synthetic-data-kit create data/output/report.txt --type cot
+manim-synthetic-data-kit create data/output/report.txt --type cot
 
 # Both of these will save file to data/generated/report_qa_pairs.json
 
 # Filter content based on quality
-synthetic-data-kit curate data/generated/report_qa_pairs.json
+manim-synthetic-data-kit curate data/generated/report_qa_pairs.json
 
 # Convert to alpaca fine-tuning format and save as HF arrow file
-synthetic-data-kit save-as data/cleaned/report_cleaned.json --format alpaca --storage hf
+manim-synthetic-data-kit save-as data/cleaned/report_cleaned.json --format alpaca --storage hf
 ```
 ## Configuration
 
@@ -148,7 +148,7 @@ api-endpoint:
 Create a overriding configuration file and use it with the `-c` flag:
 
 ```bash
-synthetic-data-kit -c my_config.yaml ingest docs/paper.pdf
+manim-synthetic-data-kit -c my_config.yaml ingest docs/paper.pdf
 ```
 
 ## Examples
@@ -157,29 +157,29 @@ synthetic-data-kit -c my_config.yaml ingest docs/paper.pdf
 
 ```bash
 # Ingest PDF
-synthetic-data-kit ingest research_paper.pdf
+manim-synthetic-data-kit ingest research_paper.pdf
 
 # Generate QA pairs
-synthetic-data-kit create data/output/research_paper.txt -n 30 --threshold 8.0
+manim-synthetic-data-kit create data/output/research_paper.txt -n 30 --threshold 8.0
 
 # Curate data
-synthetic-data-kit curate data/generated/research_paper_qa_pairs.json -t 8.5
+manim-synthetic-data-kit curate data/generated/research_paper_qa_pairs.json -t 8.5
 
 # Save in OpenAI fine-tuning format (JSON)
-synthetic-data-kit save-as data/cleaned/research_paper_cleaned.json -f ft
+manim-synthetic-data-kit save-as data/cleaned/research_paper_cleaned.json -f ft
 
 # Save in OpenAI fine-tuning format (HF dataset)
-synthetic-data-kit save-as data/cleaned/research_paper_cleaned.json -f ft --storage hf
+manim-synthetic-data-kit save-as data/cleaned/research_paper_cleaned.json -f ft --storage hf
 ```
 
 ### Processing a YouTube Video
 
 ```bash
 # Extract transcript
-synthetic-data-kit ingest "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
+manim-synthetic-data-kit ingest "https://www.youtube.com/watch?v=dQw4w9WgXcQ"
 
 # Generate QA pairs with specific model
-synthetic-data-kit create data/output/youtube_dQw4w9WgXcQ.txt
+manim-synthetic-data-kit create data/output/youtube_dQw4w9WgXcQ.txt
 ```
 
 ### Processing Multiple Files
@@ -189,10 +189,10 @@ synthetic-data-kit create data/output/youtube_dQw4w9WgXcQ.txt
 for file in data/pdf/*.pdf; do
   filename=$(basename "$file" .pdf)
   
-  synthetic-data-kit ingest "$file"
-  synthetic-data-kit create "data/output/${filename}.txt" -n 20
-  synthetic-data-kit curate "data/generated/${filename}_qa_pairs.json" -t 7.5
-  synthetic-data-kit save-as "data/cleaned/${filename}_cleaned.json" -f chatml
+  manim-synthetic-data-kit ingest "$file"
+  manim-synthetic-data-kit create "data/output/${filename}.txt" -n 20
+  manim-synthetic-data-kit curate "data/generated/${filename}_qa_pairs.json" -t 7.5
+  manim-synthetic-data-kit save-as "data/cleaned/${filename}_cleaned.json" -f chatml
 done
 ```
 
@@ -232,7 +232,7 @@ prompts:
 ```mermaid
 graph LR
     SDK --> SystemCheck[system-check]
-    SDK[synthetic-data-kit] --> Ingest[ingest]
+    SDK[manim-synthetic-data-kit] --> Ingest[ingest]
     SDK --> Create[create]
     SDK --> Curate[curate]
     SDK --> SaveAs[save-as]
@@ -260,7 +260,7 @@ graph LR
 
 - Ensure vLLM is installed: `pip install vllm`
 - Start server with: `vllm serve <model_name> --port 8000`
-- Check connection: `synthetic-data-kit system-check`
+- Check connection: `manim-synthetic-data-kit system-check`
 
 ### Memory Issues
 

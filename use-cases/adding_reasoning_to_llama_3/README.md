@@ -45,10 +45,10 @@ The benchmark tests approx 4k prompts on various categories giving a thorough un
 
 Quick overview:
 
-1. `pip install synthetic-data-kit`
+1. `pip install manim-synthetic-data-kit`
 2. Follow the [notebook](./cot_enhancement_tutorial.ipynb) to prepare the dataset
 3. This will conver the ToolACE with a new prompt and wrap <tool></tool> tags around tool responses
-4. Use the `synthetic-data-kit -c cot_tools_config.yaml create /path/to/input/file --type cot-enhance -o /path/to/output/file`
+4. Use the `manim-synthetic-data-kit -c cot_tools_config.yaml create /path/to/input/file --type cot-enhance -o /path/to/output/file`
 5. After this we will have to clean a few bad examples
 6. Now we are ready to perform FFT using this dataset
 7. Finally, we re-evaluate numbers on BFCL
@@ -146,7 +146,7 @@ We've extended the Synthetic Data Kit CLI to support enhancing tool-use conversa
 
 ```bash
 # Use the create command with type=cot-enhance and our custom config
-synthetic-data-kit -c cot_tools_config.yaml create test_files/conversation_example.json \
+manim-synthetic-data-kit -c cot_tools_config.yaml create test_files/conversation_example.json \
   --type cot-enhance \
   -o enhanced_output/
 ```
@@ -171,12 +171,12 @@ The `cot-enhance` feature is designed to be easily integrated into your data pro
 1. **Direct Command Line Usage**:
    ```bash
    # Process a single file
-   synthetic-data-kit -c custom_config.yaml create input.json --type cot-enhance -o enhanced_output/
+   manim-synthetic-data-kit -c custom_config.yaml create input.json --type cot-enhance -o enhanced_output/
    
    # Process multiple files with a loop
    for file in input_files/*.json; do
      basename=$(basename "$file" .json)
-     synthetic-data-kit -c custom_config.yaml create "$file" --type cot-enhance -o "enhanced_output/${basename}_enhanced.json"
+     manim-synthetic-data-kit -c custom_config.yaml create "$file" --type cot-enhance -o "enhanced_output/${basename}_enhanced.json"
    done
    ```
 
@@ -225,7 +225,7 @@ When working with the CoT enhancement process, you might encounter some challeng
 - **Problem**: The enhancement process runs but doesn't add CoT reasoning
 - **Solution**: 
   - Ensure your VLLM server is running with `vllm serve your-model --port 8000`
-  - Check connectivity with `synthetic-data-kit system-check`
+  - Check connectivity with `manim-synthetic-data-kit system-check`
   - Verify your model is capable of following complex prompts (Llama-3-70B-Instruct or similar recommended)
 
 ### Prompt Engineering

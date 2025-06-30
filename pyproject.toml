@@ -3,7 +3,7 @@ requires = ["hatchling"]
 build-backend = "hatchling.build"
 
 [project]
-name = "synthetic-data-kit"
+name = "manim-synthetic-data-kit"
 version = "0.0.4b2"
 description = "Tool for generating high quality Synthetic datasets"
 readme = "README.md"
@@ -63,7 +63,7 @@ classifiers = [
 "Getting Started" = "https://github.com/meta-llama/synthetic-data-kit/blob/main/getting-started/README.md"
 
 [project.scripts]
-synthetic-data-kit = "synthetic_data_kit.cli:app"
+manim-synthetic-data-kit = "synthetic_data_kit.cli:app"
 
 [tool.hatch.build.targets.wheel]
 packages = ["synthetic_data_kit"]
