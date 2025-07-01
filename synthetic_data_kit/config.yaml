@@ -38,6 +38,7 @@ lmstudio:
   model: "llama-3.3-70b-instruct" # Default model to use
   max_retries: 3                       # Number of retries for API calls
   retry_delay: 1.0                     # Initial delay between retries (seconds)
+  request_timeout: 180  # Timeout for requests in seconds (default 180)
   
 # API endpoint configuration
 api-endpoint:
