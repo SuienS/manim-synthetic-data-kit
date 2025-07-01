@@ -13,7 +13,7 @@ import requests
 from rich.console import Console
 from rich.table import Table
 
-from synthetic_data_kit.utils.config import load_config, get_vllm_config, get_openai_config, get_llm_provider, get_path_config
+from synthetic_data_kit.utils.config import load_config, get_vllm_config, get_openai_config, get_llm_provider, get_path_config, get_lmstudio_config
 from synthetic_data_kit.core.context import AppContext
 from synthetic_data_kit.server.app import run_server
 
@@ -126,6 +126,31 @@ def system_check(
             except Exception as e:
                 console.print(f"L Error: {str(e)}", style="red")
                 return 1
+    elif selected_provider == "lmstudio":
+        # Get LM Studio server details
+        lmstudio_config = get_lmstudio_config(ctx.config)
+        api_base = api_base or lmstudio_config.get("api_base")
+        model = lmstudio_config.get("model")
+        port = lmstudio_config.get("port", 1234)
+        
+        with console.status(f"Checking LM Studio server at {api_base}..."):
+            try:
+                response = requests.get(f"{api_base}/models", timeout=2)
+                if response.status_code == 200:
+                    console.print(f" LM Studio server is running at {api_base}", style="green")
+                    console.print(f"Available models: {response.json()}")
+                    return 0
+                else:
+                    console.print(f"L LM Studio server is not available at {api_base}", style="red")
+                    console.print(f"Error: Server returned status code: {response.status_code}")
+            except requests.exceptions.RequestException as e:
+                console.print(f"L LM Studio server is not available at {api_base}", style="red")
+                console.print(f"Error: {str(e)}")
+                
+            # Show instruction to start the server
+            console.print("\nTo start the server, run:", style="yellow")
+            console.print(f"lmstudio serve --port {port}", style="bold blue")
+            return 1
     else:
         # Default to vLLM
         # Get vLLM server details
@@ -233,6 +258,25 @@ def create(
         api_base = api_base or api_endpoint_config.get("api_base")
         model = model or api_endpoint_config.get("model")
         # No server check needed for API endpoint
+    elif provider == "lmstudio":
+        # Use LM Studio config
+        lmstudio_config = get_lmstudio_config(ctx.config)
+        api_base = api_base or lmstudio_config.get("api_base")
+        model = model or lmstudio_config.get("model")
+        
+        # Check LM Studio server availability
+        try:
+            response = requests.get(f"{api_base}/models", timeout=2)
+            if response.status_code != 200:
+                console.print(f"L Error: LM Studio server not available at {api_base}", style="red")
+                console.print("Please start the LM Studio server with:", style="yellow")
+                console.print(f"lmstudio serve --port {lmstudio_config.get('port', 1234)}", style="bold blue")
+                return 1
+        except requests.exceptions.RequestException:
+            console.print(f"L Error: LM Studio server not available at {api_base}", style="red")
+            console.print("Please start the LM Studio server with:", style="yellow")
+            console.print(f"lmstudio serve --port {lmstudio_config.get('port', 1234)}", style="bold blue")
+            return 1
     else:
         # Use vLLM config
         vllm_config = get_vllm_config(ctx.config)
@@ -312,6 +356,25 @@ def curate(
         api_base = api_base or api_endpoint_config.get("api_base")
         model = model or api_endpoint_config.get("model")
         # No server check needed for API endpoint
+    elif provider == "lmstudio":
+        # Use LM Studio config
+        lmstudio_config = get_lmstudio_config(ctx.config)
+        api_base = api_base or lmstudio_config.get("api_base")
+        model = model or lmstudio_config.get("model")
+        
+        # Check LM Studio server availability
+        try:
+            response = requests.get(f"{api_base}/models", timeout=2)
+            if response.status_code != 200:
+                console.print(f"L Error: LM Studio server not available at {api_base}", style="red")
+                console.print("Please start the LM Studio server with:", style="yellow")
+                console.print(f"lmstudio serve --port {lmstudio_config.get('port', 1234)}", style="bold blue")
+                return 1
+        except requests.exceptions.RequestException:
+            console.print(f"L Error: LM Studio server not available at {api_base}", style="red")
+            console.print("Please start the LM Studio server with:", style="yellow")
+            console.print(f"lmstudio serve --port {lmstudio_config.get('port', 1234)}", style="bold blue")
+            return 1
     else:
         # Use vLLM config
         vllm_config = get_vllm_config(ctx.config)

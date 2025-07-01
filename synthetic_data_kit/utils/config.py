@@ -92,6 +92,15 @@ def get_vllm_config(config: Dict[str, Any]) -> Dict[str, Any]:
         'retry_delay': 1.0
     })
 
+def get_lmstudio_config(config: Dict[str, Any]) -> Dict[str, Any]:
+    """Get LM Studio configuration"""
+    return config.get('lmstudio', {
+        'api_base': 'http://localhost:1234/v1',
+        'model': 'meta-llama/Llama-3.3-70B-Instruct',
+        'max_retries': 3,
+        'retry_delay': 1.0
+    })
+
 def get_openai_config(config: Dict[str, Any]) -> Dict[str, Any]:
     """Get API endpoint configuration"""
     return config.get('api-endpoint', {
