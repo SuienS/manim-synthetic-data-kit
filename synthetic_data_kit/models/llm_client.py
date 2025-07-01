@@ -92,6 +92,7 @@ class LLMClient:
             self.model = model_name or lmstudio_config.get('model')
             self.max_retries = max_retries or lmstudio_config.get('max_retries')
             self.retry_delay = retry_delay or lmstudio_config.get('retry_delay')
+            self.request_timeout = lmstudio_config.get('request_timeout', 180)  # Default to 180 seconds
 
             available, info = self._check_lmstudio_server()
             if not available:
@@ -330,7 +331,7 @@ class LLMClient:
                     f"{self.api_base}/chat/completions",
                     headers={"Content-Type": "application/json"},
                     data=json.dumps(data),
-                    timeout=180  # Increased timeout to 180 seconds
+                    timeout=self.request_timeout  # Use configured timeout
                 )
                 
                 if verbose:
@@ -638,7 +639,7 @@ class LLMClient:
                         f"{self.api_base}/chat/completions",
                         headers={"Content-Type": "application/json"},
                         data=json.dumps(request_data),
-                        timeout=180  # Increased timeout for batch processing
+                        timeout=self.request_timeout  # Use configured timeout
                     )
                     
                     if verbose:
