@@ -41,7 +41,7 @@ class LLMClient:
         
         Args:
             config_path: Path to config file (if None, uses default)
-            provider: Override provider from config ('vllm' or 'api-endpoint')
+            provider: Override provider from config ('vllm', 'api-endpoint' or 'lmstudio')
             api_base: Override API base URL from config
             api_key: Override API key for API endpoint (only needed for 'api-endpoint' provider)
             model_name: Override model name from config
@@ -81,6 +81,22 @@ class LLMClient:
             
             # Initialize OpenAI client
             self._init_openai_client()
+
+        elif self.provider == 'lmstudio':
+            # Load LLM Studio configuration
+            lmstudio_config = self.config.get('lmstudio', {})
+            
+            # Set parameters, with CLI overrides taking precedence
+            self.api_base = api_base or lmstudio_config.get('api_base')
+            self.api_key = api_key or lmstudio_config.get('api_key')
+            self.model = model_name or lmstudio_config.get('model')
+            self.max_retries = max_retries or lmstudio_config.get('max_retries')
+            self.retry_delay = retry_delay or lmstudio_config.get('retry_delay')
+
+            available, info = self._check_lmstudio_server()
+            if not available:
+                raise ConnectionError(f"LLM Studio server not available at {self.api_base}: {info}")
+
         else:  # Default to vLLM
             # Load vLLM configuration
             vllm_config = get_vllm_config(self.config)
@@ -115,6 +131,16 @@ class LLMClient:
             client_kwargs['base_url'] = self.api_base
         
         self.openai_client = OpenAI(**client_kwargs)
+
+    def _check_lmstudio_server(self) -> tuple:
+        """Check if the LLM Studio server is running and accessible"""
+        try:
+            response = requests.get(f"{self.api_base}/models", timeout=5)
+            if response.status_code == 200:
+                return True, response.json()
+            return False, f"Server returned status code: {response.status_code}"
+        except requests.exceptions.RequestException as e:
+            return False, f"Server connection error: {str(e)}"
     
     def _check_vllm_server(self) -> tuple:
         """Check if the VLLM server is running and accessible"""
@@ -152,6 +178,8 @@ class LLMClient:
         
         if self.provider == 'api-endpoint':
             return self._openai_chat_completion(messages, temperature, max_tokens, top_p, verbose)
+        elif self.provider == 'lmstudio':
+            return self._lmstudio_chat_completion(messages, temperature, max_tokens, top_p, verbose)
         else:  # Default to vLLM
             return self._vllm_chat_completion(messages, temperature, max_tokens, top_p, verbose)
     
@@ -276,6 +304,45 @@ class LLMClient:
                     raise Exception(f"Failed to get {self.provider} completion after {self.max_retries} attempts: {str(e)}")
                 
                 time.sleep(self.retry_delay * (attempt + 1))  # Exponential backoff
+
+    def _lmstudio_chat_completion(self,
+                                    messages: List[Dict[str, str]],
+                                    temperature: float,
+                                    max_tokens: int,
+                                    top_p: float,
+                                    verbose: bool) -> str:
+        """Generate a chat completion using the LLM Studio OpenAI-compatible API"""
+        data = {
+            "model": self.model,
+            "messages": messages,
+            "temperature": temperature,
+            "max_tokens": max_tokens,
+            "top_p": top_p
+        }
+
+        for attempt in range(self.max_retries):
+            try:
+                # Only print if verbose mode is enabled
+                if verbose:
+                    logger.info(f"Sending request to LLM Studio model {self.model}...")
+                
+                response = requests.post(
+                    f"{self.api_base}/chat/completions",
+                    headers={"Content-Type": "application/json"},
+                    data=json.dumps(data),
+                    timeout=180  # Increased timeout to 180 seconds
+                )
+                
+                if verbose:
+                    logger.info(f"Received response with status code: {response.status_code}")
+                
+                response.raise_for_status()
+                return response.json()["choices"][0]["message"]["content"]
+            
+            except (requests.exceptions.RequestException, KeyError, IndexError) as e:
+                if attempt == self.max_retries - 1:
+                    raise Exception(f"Failed to get LLM Studio completion after {self.max_retries} attempts: {str(e)}")
+                time.sleep(self.retry_delay * (attempt + 1))  # Exponential backoff
     
     def _vllm_chat_completion(self, 
                             messages: List[Dict[str, str]],
@@ -338,6 +405,8 @@ class LLMClient:
         
         if self.provider == 'api-endpoint':
             return self._openai_batch_completion(message_batches, temperature, max_tokens, top_p, batch_size, verbose)
+        elif self.provider == 'lmstudio':
+            return self._lmstudio_batch_completion(message_batches, temperature, max_tokens, top_p, batch_size, verbose)
         else:  # Default to vLLM
             return self._vllm_batch_completion(message_batches, temperature, max_tokens, top_p, batch_size, verbose)
     
@@ -529,6 +598,64 @@ class LLMClient:
             if i + batch_size < len(message_batches):
                 time.sleep(0.5)
         
+        return results
+    
+    def _lmstudio_batch_completion(self,
+                                  message_batches: List[List[Dict[str, str]]],
+                                  temperature: float,
+                                  max_tokens: int,
+                                  top_p: float,
+                                  batch_size: int,
+                                  verbose: bool) -> List[str]:
+        """Process multiple message sets in batches using LLM Studio's API"""
+        results = []
+        # Process message batches in chunks to avoid overloading the server
+        for i in range(0, len(message_batches), batch_size):
+            batch_chunk = message_batches[i:i+batch_size]
+            if verbose:
+                logger.info(f"Processing batch {i//batch_size + 1}/{(len(message_batches) + batch_size - 1) // batch_size} with {len(batch_chunk)} requests")
+            
+            # Create batch request payload for LLM Studio
+            batch_requests = []
+            for messages in batch_chunk:
+                batch_requests.append({
+                    "model": self.model,
+                    "messages": messages,
+                    "temperature": temperature,
+                    "max_tokens": max_tokens,
+                    "top_p": top_p
+                })
+            
+            try:
+                # For now, we run these in parallel with multiple requests
+                batch_results = []
+                for request_data in batch_requests:
+                    # Only print if verbose mode is enabled
+                    if verbose:
+                        logger.info(f"Sending batch request to LLM Studio model {self.model}...")
+                    
+                    response = requests.post(
+                        f"{self.api_base}/chat/completions",
+                        headers={"Content-Type": "application/json"},
+                        data=json.dumps(request_data),
+                        timeout=180  # Increased timeout for batch processing
+                    )
+                    
+                    if verbose:
+                        logger.info(f"Received response with status code: {response.status_code}")
+                    
+                    response.raise_for_status()
+                    content = response.json()["choices"][0]["message"]["content"]
+                    batch_results.append(content)
+                
+                results.extend(batch_results)
+                
+            except (requests.exceptions.RequestException, KeyError, IndexError) as e:
+                raise Exception(f"Failed to process LLM Studio batch: {str(e)}")
+            
+            # Small delay between batches
+            if i + batch_size < len(message_batches):
+                time.sleep(0.1)
         return results
     
     def _vllm_batch_completion(self,

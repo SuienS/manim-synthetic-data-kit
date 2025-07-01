@@ -73,7 +73,7 @@ def get_llm_provider(config: Dict[str, Any]) -> str:
     """Get the selected LLM provider
     
     Returns:
-        String with provider name: 'vllm' or 'api-endpoint'
+        String with provider name: 'vllm', 'api-endpoint' or 'lmstudio'.
     """
     llm_config = config.get('llm', {})
     provider = llm_config.get('provider', 'vllm')
