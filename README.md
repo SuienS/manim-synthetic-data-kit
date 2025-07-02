@@ -6,6 +6,13 @@ Generate Reasoning Traces, QA Pairs, save them to a fine-tuning format with a si
 
 > [Checkout our guide on using the tool to unlock task-specific reasoning in Llama-3 family](https://github.com/meta-llama/synthetic-data-kit/tree/main/use-cases/adding_reasoning_to_llama_3)
 
+# Changes in this Fork
+This fork of the Synthetic Data Kit is tailored for generating synthetic datasets from Manim source code files. It automates the process of creating question-answer pairs based on the content of Manim scripts, making it easier to fine-tune large language models (LLMs) for tasks related to mathematical animations and visualizations.
+## Key Changes:
+- **Code Chunk Processing**: Added `doc_type` parameter to the `create` command to specify the type of document being processed (e.g., `code` for Manim source code).
+- **LMStudio Support**: Added support for LMStudio, allowing users to generate datasets compatible with this platform.
+- **Configurable Timeouts**: Added ability to set timeouts for LLM requests, ensuring long-running requests do not timeout prematurely.
+
 # What does Synthetic Data Kit offer? 
 
 Fine-Tuning Large Language Models is easy. There are many mature tools that you can use to fine-tune Llama model family using various post-training techniques.
