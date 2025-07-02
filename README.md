@@ -9,7 +9,7 @@ Generate Reasoning Traces, QA Pairs, save them to a fine-tuning format with a si
 # Changes in this Fork
 This fork of the Synthetic Data Kit is tailored for generating synthetic datasets from Manim source code files. It automates the process of creating question-answer pairs based on the content of Manim scripts, making it easier to fine-tune large language models (LLMs) for tasks related to mathematical animations and visualizations.
 ## Key Changes:
-- **Code Chunk Processing**: Added `doc_type` parameter to the `create` command to specify the type of document being processed (e.g., `code` for Manim source code).
+- **Code Chunk Processing**: Added `doc_type` parameter to the `create` command to specify the type of document being processed (e.g., `code` for Manim source code). This allows the tool to chunk and process code files while preserving their structure and semantics.
 - **LMStudio Support**: Added support for LMStudio, allowing users to generate datasets compatible with this platform.
 - **Configurable Timeouts**: Added ability to set timeouts for LLM requests, ensuring long-running requests do not timeout prematurely.
 
